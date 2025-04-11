@@ -77,17 +77,18 @@ public:
     uint16_t kp_int = std::clamp(kp / 500.0f * 65535.0f, 0.0f, 65535.0f);
     uint16_t kd_int = std::clamp(kd / 5.0f * 65535.0f, 0.0f, 65535.0f);
 
-    CyberGearMessage msg{CommunicationType::TYPE_1,
-                         motor_can_id_,
-                         {static_cast<uint8_t>((angle_int >> 8) & 0xFF),
-                          static_cast<uint8_t>(angle_int & 0xFF),
-                          static_cast<uint8_t>((velocity_int >> 8) & 0xFF),
-                          static_cast<uint8_t>(velocity_int & 0xFF),
-                          static_cast<uint8_t>((kp_int >> 8) & 0xFF),
-                          static_cast<uint8_t>(kp_int & 0xFF),
-                          static_cast<uint8_t>((kd_int >> 8) & 0xFF),
-                          static_cast<uint8_t>(kd_int & 0xFF)},
-                         torque_int};
+    CyberGearMessage msg;
+    msg.type = CommunicationType::TYPE_1;
+    msg.target_address = motor_can_id_;
+    msg.data1[0] = (angle_int >> 8) & 0xFF;
+    msg.data1[1] = angle_int & 0xFF;
+    msg.data1[2] = (velocity_int >> 8) & 0xFF;
+    msg.data1[3] = velocity_int & 0xFF;
+    msg.data1[4] = (kp_int >> 8) & 0xFF;
+    msg.data1[5] = kp_int & 0xFF;
+    msg.data1[6] = (kd_int >> 8) & 0xFF;
+    msg.data1[7] = kd_int & 0xFF;
+    msg.data2 = torque_int;
     auto res = send_message(msg);
     if (!res) {
       return std::nullopt;
@@ -252,16 +253,20 @@ private:
     if (msg.type != CommunicationType::TYPE_2) {
       return std::nullopt;
     }
-    return CyberGearFeedback{
-        static_cast<uint8_t>(msg.data2 & 0xFF),
-        static_cast<uint8_t>((msg.data2 >> 8) & 0x3F),
-        static_cast<uint8_t>((msg.data2 >> 14) & 0x3),
-        ((msg.data1[0] << 8) | msg.data1[1]) / 65535.0f * 8.0f *
-                static_cast<float>(M_PI) -
-            4.0f * static_cast<float>(M_PI),
-        ((msg.data1[2] << 8) | msg.data1[3]) / 65535.0f * 60.0f - 30.0f,
-        ((msg.data1[4] << 8) | msg.data1[5]) / 65535.0f * 24.0f - 12.0f,
-        ((msg.data1[6] << 8) | msg.data1[7]) / 10.0f};
+
+    CyberGearFeedback feedback;
+    feedback.motor_can_id = msg.data2 & 0xFF;
+    feedback.fault = (msg.data2 >> 8) & 0x3F;
+    feedback.mode = (msg.data2 >> 14) & 0x3;
+    feedback.angle =
+        ((msg.data1[0] << 8) | msg.data1[1]) / 65535.0f * 8.0f * M_PI -
+        4.0f * M_PI;
+    feedback.velocity =
+        ((msg.data1[2] << 8) | msg.data1[3]) / 65535.0f * 60.0f - 30.0f;
+    feedback.torque =
+        ((msg.data1[4] << 8) | msg.data1[5]) / 65535.0f * 24.0f - 12.0f;
+    feedback.temperature = ((msg.data1[6] << 8) | msg.data1[7]) / 10.0f;
+    return feedback;
   }
 
   std::optional<CyberGearMessage> send_message(const CyberGearMessage &msg) {
