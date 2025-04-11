@@ -50,9 +50,10 @@ struct CyberGearFeedback {
   float temperature;
 };
 
-template <class CAN_> class CyberGear {
+class CyberGear {
 public:
-  CyberGear(CAN_ &can, uint8_t motor_can_id, uint8_t host_can_id)
+  CyberGear(stm32rcos::peripheral::CANBase &can, uint8_t motor_can_id,
+            uint8_t host_can_id)
       : can_{can}, motor_can_id_{motor_can_id}, master_can_id_{host_can_id} {
     can_.attach_rx_queue(
         {static_cast<uint32_t>(motor_can_id_ << 8), 0x800FF00, true},
@@ -185,7 +186,7 @@ private:
     uint16_t data2;
   };
 
-  CAN_ &can_;
+  stm32rcos::peripheral::CANBase &can_;
   stm32rcos::core::Queue<stm32rcos::peripheral::CANMessage> rx_queue_{8};
   uint8_t motor_can_id_;
   uint8_t master_can_id_;
