@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <optional>
 
-#include <stm32rcos/peripheral/uart_dma.hpp>
+#include <stm32rcos/peripheral/uart.hpp>
 
 namespace stm32rcos_drivers {
 
@@ -48,7 +48,7 @@ struct UnitreeGOFeedback {
 
 class UnitreeGO {
 public:
-  UnitreeGO(stm32rcos::peripheral::UART_DMA &uart) : uart_{uart} {}
+  UnitreeGO(stm32rcos::peripheral::UARTBase &uart) : uart_{uart} {}
 
   std::optional<UnitreeGOFeedback> transmit(const UnitreeGOCommand &command) {
     auto tx_buf = to_uart_buf(command);
@@ -64,7 +64,7 @@ public:
   }
 
 private:
-  stm32rcos::peripheral::UART_DMA &uart_;
+  stm32rcos::peripheral::UARTBase &uart_;
 
   static inline std::array<uint8_t, 17>
   to_uart_buf(const UnitreeGOCommand &command) {

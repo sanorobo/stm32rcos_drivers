@@ -4,13 +4,13 @@
 #include <cstdint>
 #include <optional>
 
-#include <stm32rcos/peripheral/uart_dma.hpp>
+#include <stm32rcos/peripheral/uart.hpp>
 
 namespace stm32rcos_drivers {
 
 class AMT21Manager {
 public:
-  AMT21Manager(stm32rcos::peripheral::UART_DMA &uart) : uart_{uart} {}
+  AMT21Manager(stm32rcos::peripheral::UARTBase &uart) : uart_{uart} {}
 
   std::optional<std::array<uint8_t, 2>> send_command(uint8_t address,
                                                      uint8_t command) {
@@ -39,7 +39,7 @@ public:
   }
 
 private:
-  stm32rcos::peripheral::UART_DMA &uart_;
+  stm32rcos::peripheral::UARTBase &uart_;
 
   static inline bool test_checksum(uint8_t l, uint8_t h) {
     bool k1 = !(bit(h, 5) ^ bit(h, 3) ^ bit(h, 1) ^ bit(l, 7) ^ bit(l, 5) ^

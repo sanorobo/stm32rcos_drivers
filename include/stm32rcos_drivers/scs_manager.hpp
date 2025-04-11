@@ -4,13 +4,13 @@
 #include <cstdint>
 #include <optional>
 
-#include <stm32rcos/peripheral/uart_dma.hpp>
+#include <stm32rcos/peripheral/uart.hpp>
 
 namespace stm32rcos_drivers {
 
 class SCSManager {
 public:
-  SCSManager(stm32rcos::peripheral::UART_DMA &uart) : uart_{uart} {}
+  SCSManager(stm32rcos::peripheral::UARTBase &uart) : uart_{uart} {}
 
   std::optional<uint8_t> ping(uint8_t id) {
     if (!send_message(id, Instruction::PING, 0, nullptr, 0)) {
@@ -101,7 +101,7 @@ private:
     RESET = 0x0A,
   };
 
-  stm32rcos::peripheral::UART_DMA &uart_;
+  stm32rcos::peripheral::UARTBase &uart_;
 
   bool send_message(uint8_t id, Instruction instruction, uint8_t address,
                     const uint8_t *data, uint8_t size) {
