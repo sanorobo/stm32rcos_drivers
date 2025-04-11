@@ -75,7 +75,9 @@ private:
     int16_t k_pos = std::clamp(command.kp, 0.0f, 25.599f) * 1280.0f;
     int16_t k_spd = std::clamp(command.kd, 0.0f, 25.599f) * 1280.0f;
 
-    std::array<uint8_t, 17> buf{0xFE, 0xEE};
+    std::array<uint8_t, 17> buf;
+    buf[0] = 0xFE;
+    buf[1] = 0xEE;
     buf[2] = stm32rcos::core::to_underlying(command.mode) << 4 | command.id;
     buf[3] = tau_set & 0xFF;
     buf[4] = (tau_set >> 8) & 0xFF;
