@@ -9,7 +9,7 @@
 #include <Eigen/Geometry>
 
 #include <stm32rcos/core.hpp>
-#include <stm32rcos/peripheral.hpp>
+#include <stm32rcos/peripheral/uart.hpp>
 
 namespace stm32rcos_drivers {
 

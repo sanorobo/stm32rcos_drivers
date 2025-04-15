@@ -5,10 +5,11 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <numbers>
 #include <optional>
 
 #include <stm32rcos/core.hpp>
-#include <stm32rcos/peripheral.hpp>
+#include <stm32rcos/peripheral/can.hpp>
 
 namespace stm32rcos_drivers {
 
@@ -69,8 +70,8 @@ public:
     uint16_t torque_int =
         std::clamp((torque + 12.0f) / 24.0f * 65535.0f, 0.0f, 65535.0f);
     uint16_t angle_int =
-        std::clamp((angle + 4.0f * static_cast<float>(M_PI)) /
-                       (8.0f * static_cast<float>(M_PI)) * 65535.0f,
+        std::clamp((angle + 4.0f * static_cast<float>(std::numbers::pi)) /
+                       (8.0f * static_cast<float>(std::numbers::pi)) * 65535.0f,
                    0.0f, 65535.0f);
     uint16_t velocity_int =
         std::clamp((velocity + 30.0f) / 60.0f * 65535.0f, 0.0f, 65535.0f);
@@ -258,9 +259,9 @@ private:
     feedback.motor_can_id = msg.data2 & 0xFF;
     feedback.fault = (msg.data2 >> 8) & 0x3F;
     feedback.mode = (msg.data2 >> 14) & 0x3;
-    feedback.angle =
-        ((msg.data1[0] << 8) | msg.data1[1]) / 65535.0f * 8.0f * M_PI -
-        4.0f * M_PI;
+    feedback.angle = ((msg.data1[0] << 8) | msg.data1[1]) / 65535.0f * 8.0f *
+                         std::numbers::pi -
+                     4.0f * std::numbers::pi;
     feedback.velocity =
         ((msg.data1[2] << 8) | msg.data1[3]) / 65535.0f * 60.0f - 30.0f;
     feedback.torque =
