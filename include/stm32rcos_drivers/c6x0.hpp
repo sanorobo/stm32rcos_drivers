@@ -29,14 +29,14 @@ enum class C6x0ID {
 
 class C6x0Manager {
 public:
-  C6x0Manager(stm32rcos::peripheral::CANBase &can) : can_{can} {
+  C6x0Manager(stm32rcos::peripheral::CanBase &can) : can_{can} {
     can_.attach_rx_queue({0x200, 0x7F0, false}, rx_queue_);
   }
 
   ~C6x0Manager() { can_.detach_rx_queue(rx_queue_); }
 
   void update() {
-    stm32rcos::peripheral::CANMessage msg;
+    stm32rcos::peripheral::CanMessage msg;
     while (rx_queue_.pop(msg, 0)) {
       if (0x201 <= msg.id && msg.id < 0x201 + 8) {
         Params &motor = params_[msg.id - 0x201];
@@ -61,7 +61,7 @@ public:
   }
 
   bool transmit() {
-    stm32rcos::peripheral::CANMessage msg{0x200, false, 8};
+    stm32rcos::peripheral::CanMessage msg{0x200, false, 8};
     for (size_t i = 0; i < 4; ++i) {
       msg.data[i * 2] = params_[i].current_ref_raw_ >> 8;
       msg.data[i * 2 + 1] = params_[i].current_ref_raw_;
@@ -103,8 +103,8 @@ private:
     int16_t current_ref_raw_ = 0;
   };
 
-  stm32rcos::peripheral::CANBase &can_;
-  stm32rcos::core::Queue<stm32rcos::peripheral::CANMessage> rx_queue_{64};
+  stm32rcos::peripheral::CanBase &can_;
+  stm32rcos::core::Queue<stm32rcos::peripheral::CanMessage> rx_queue_{64};
   std::array<Params, 8> params_{};
 };
 

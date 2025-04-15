@@ -52,7 +52,7 @@ struct CyberGearFeedback {
 
 class CyberGear {
 public:
-  CyberGear(stm32rcos::peripheral::CANBase &can, uint8_t motor_can_id,
+  CyberGear(stm32rcos::peripheral::CanBase &can, uint8_t motor_can_id,
             uint8_t host_can_id)
       : can_{can}, motor_can_id_{motor_can_id}, master_can_id_{host_can_id} {
     can_.attach_rx_queue(
@@ -187,12 +187,12 @@ private:
     uint16_t data2;
   };
 
-  stm32rcos::peripheral::CANBase &can_;
-  stm32rcos::core::Queue<stm32rcos::peripheral::CANMessage> rx_queue_{8};
+  stm32rcos::peripheral::CanBase &can_;
+  stm32rcos::core::Queue<stm32rcos::peripheral::CanMessage> rx_queue_{8};
   uint8_t motor_can_id_;
   uint8_t master_can_id_;
 
-  static inline stm32rcos::peripheral::CANMessage
+  static inline stm32rcos::peripheral::CanMessage
   to_can_message(const CyberGearMessage &msg) {
     return {
         static_cast<uint32_t>(stm32rcos::core::to_underlying(msg.type) << 24 |
@@ -201,7 +201,7 @@ private:
   }
 
   static inline std::optional<CyberGearMessage>
-  to_cyber_gear_message(const stm32rcos::peripheral::CANMessage &msg) {
+  to_cyber_gear_message(const stm32rcos::peripheral::CanMessage &msg) {
     CyberGearMessage cyber_gear_msg;
     uint8_t type = (msg.id >> 24) & 0x1F;
     cyber_gear_msg.target_address = msg.id & 0xFF;
@@ -270,7 +270,7 @@ private:
   }
 
   std::optional<CyberGearMessage> send_message(const CyberGearMessage &msg) {
-    stm32rcos::peripheral::CANMessage can_msg = to_can_message(msg);
+    stm32rcos::peripheral::CanMessage can_msg = to_can_message(msg);
     rx_queue_.clear();
     if (!can_.transmit(can_msg, 5)) {
       return std::nullopt;

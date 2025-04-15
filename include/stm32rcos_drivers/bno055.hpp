@@ -132,7 +132,7 @@ enum class BNO055Register : uint8_t {
 
 class BNO055 {
 public:
-  BNO055(stm32rcos::peripheral::UARTBase &uart) : uart_{uart} {}
+  BNO055(stm32rcos::peripheral::UartBase &uart) : uart_{uart} {}
 
   bool start(uint32_t timeout) {
     stm32rcos::core::TimeoutHelper timeout_helper;
@@ -202,7 +202,7 @@ public:
   }
 
 private:
-  stm32rcos::peripheral::UARTBase &uart_;
+  stm32rcos::peripheral::UartBase &uart_;
 };
 
 } // namespace stm32rcos_drivers

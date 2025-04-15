@@ -15,7 +15,7 @@ enum class AMT21Resolution : uint8_t {
 
 class AMT21Manager {
 public:
-  AMT21Manager(stm32rcos::peripheral::UARTBase &uart) : uart_{uart} {}
+  AMT21Manager(stm32rcos::peripheral::UartBase &uart) : uart_{uart} {}
 
   std::optional<std::array<uint8_t, 2>> send_command(uint8_t address,
                                                      uint8_t command) {
@@ -44,7 +44,7 @@ public:
   }
 
 private:
-  stm32rcos::peripheral::UARTBase &uart_;
+  stm32rcos::peripheral::UartBase &uart_;
 
   static inline bool test_checksum(uint8_t l, uint8_t h) {
     bool k1 = !(bit(h, 5) ^ bit(h, 3) ^ bit(h, 1) ^ bit(l, 7) ^ bit(l, 5) ^

@@ -34,7 +34,7 @@ enum class PS3Key {
 
 class PS3 {
 public:
-  PS3(stm32rcos::peripheral::UARTBase &uart) : uart_{uart} {}
+  PS3(stm32rcos::peripheral::UartBase &uart) : uart_{uart} {}
 
   void update() {
     keys_prev_ = keys_;
@@ -77,7 +77,7 @@ public:
   }
 
 private:
-  stm32rcos::peripheral::UARTBase &uart_;
+  stm32rcos::peripheral::UartBase &uart_;
   std::array<uint8_t, 8> buf_{};
   std::array<float, 4> axes_{};
   uint16_t keys_ = 0;
