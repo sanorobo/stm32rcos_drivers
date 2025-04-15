@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdint>
 #include <optional>
+#include <utility>
 
 #include <stm32rcos/peripheral/uart.hpp>
 
@@ -106,7 +107,7 @@ private:
   bool send_message(uint8_t id, Instruction instruction, uint8_t address,
                     const uint8_t *data, uint8_t size) {
     std::array<uint8_t, 5> buf{0xFF, 0xFF, id, static_cast<uint8_t>(size + 3),
-                               stm32rcos::core::to_underlying(instruction)};
+                               std::to_underlying(instruction)};
     uart_.flush();
     if (!uart_.transmit(buf.data(), buf.size(), 5)) {
       return false;

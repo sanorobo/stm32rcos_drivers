@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <optional>
+#include <utility>
 
 #include <stm32rcos/core.hpp>
 #include <stm32rcos/peripheral/can.hpp>
@@ -79,19 +80,17 @@ public:
   }
 
   int64_t get_position(C6x0ID id) {
-    return params_[stm32rcos::core::to_underlying(id)].position_;
+    return params_[std::to_underlying(id)].position_;
   }
 
-  int16_t get_rpm(C6x0ID id) {
-    return params_[stm32rcos::core::to_underlying(id)].rpm_;
-  }
+  int16_t get_rpm(C6x0ID id) { return params_[std::to_underlying(id)].rpm_; }
 
   int16_t get_current_raw(C6x0ID id) {
-    return params_[stm32rcos::core::to_underlying(id)].current_raw_;
+    return params_[std::to_underlying(id)].current_raw_;
   }
 
   void set_current_ref_raw(C6x0ID id, int16_t current) {
-    params_[stm32rcos::core::to_underlying(id)].current_ref_raw_ = current;
+    params_[std::to_underlying(id)].current_ref_raw_ = current;
   }
 
 private:

@@ -3,6 +3,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <utility>
 
 #include <stm32rcos/peripheral/uart.hpp>
 
@@ -58,22 +59,19 @@ public:
     }
   }
 
-  float get_axis(PS3Axis axis) {
-    return axes_[stm32rcos::core::to_underlying(axis)];
-  }
+  float get_axis(PS3Axis axis) { return axes_[std::to_underlying(axis)]; }
 
   bool get_key(PS3Key key) {
-    return (keys_ & (1 << stm32rcos::core::to_underlying(key))) != 0;
+    return (keys_ & (1 << std::to_underlying(key))) != 0;
   }
 
   bool get_key_down(PS3Key key) {
-    return ((keys_ ^ keys_prev_) & keys_ &
-            (1 << stm32rcos::core::to_underlying(key))) != 0;
+    return ((keys_ ^ keys_prev_) & keys_ & (1 << std::to_underlying(key))) != 0;
   }
 
   bool get_key_up(PS3Key key) {
     return ((keys_ ^ keys_prev_) & keys_prev_ &
-            (1 << stm32rcos::core::to_underlying(key))) != 0;
+            (1 << std::to_underlying(key))) != 0;
   }
 
 private:

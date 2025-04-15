@@ -7,6 +7,7 @@
 #include <cstring>
 #include <numbers>
 #include <optional>
+#include <utility>
 
 #include <stm32rcos/core.hpp>
 #include <stm32rcos/peripheral/can.hpp>
@@ -131,7 +132,7 @@ public:
 
   template <class T>
   std::optional<T> read_parameter(CyberGearParameter parameter) {
-    uint16_t index = stm32rcos::core::to_underlying(parameter);
+    uint16_t index = std::to_underlying(parameter);
     CyberGearMessage msg{
         CommunicationType::TYPE_17,
         motor_can_id_,
@@ -152,7 +153,7 @@ public:
   template <class T>
   std::optional<CyberGearFeedback> write_parameter(CyberGearParameter parameter,
                                                    T data) {
-    uint16_t index = stm32rcos::core::to_underlying(parameter);
+    uint16_t index = std::to_underlying(parameter);
     CyberGearMessage msg{
         CommunicationType::TYPE_18,
         motor_can_id_,
@@ -195,10 +196,9 @@ private:
 
   static inline stm32rcos::peripheral::CanMessage
   to_can_message(const CyberGearMessage &msg) {
-    return {
-        static_cast<uint32_t>(stm32rcos::core::to_underlying(msg.type) << 24 |
-                              msg.data2 << 8 | msg.target_address),
-        true, 8, msg.data1};
+    return {static_cast<uint32_t>(std::to_underlying(msg.type) << 24 |
+                                  msg.data2 << 8 | msg.target_address),
+            true, 8, msg.data1};
   }
 
   static inline std::optional<CyberGearMessage>

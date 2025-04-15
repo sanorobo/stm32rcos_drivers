@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <numbers>
 #include <optional>
+#include <utility>
 
 #include <stm32rcos/peripheral/uart.hpp>
 
@@ -79,7 +80,7 @@ private:
     std::array<uint8_t, 17> buf;
     buf[0] = 0xFE;
     buf[1] = 0xEE;
-    buf[2] = stm32rcos::core::to_underlying(command.mode) << 4 | command.id;
+    buf[2] = std::to_underlying(command.mode) << 4 | command.id;
     buf[3] = tau_set & 0xFF;
     buf[4] = (tau_set >> 8) & 0xFF;
     buf[5] = omega_set & 0xFF;

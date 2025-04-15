@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <optional>
+#include <utility>
 
 #include <Eigen/Geometry>
 
@@ -165,8 +166,7 @@ public:
   template <size_t N>
   bool write_register(BNO055Register address,
                       const std::array<uint8_t, N> &data) {
-    std::array<uint8_t, 4> buf{0xAA, 0x00,
-                               stm32rcos::core::to_underlying(address), N};
+    std::array<uint8_t, 4> buf{0xAA, 0x00, std::to_underlying(address), N};
     uart_.flush();
     if (!uart_.transmit(buf.data(), buf.size(), 5)) {
       return false;
@@ -182,8 +182,7 @@ public:
 
   template <size_t N>
   std::optional<std::array<uint8_t, N>> read_register(BNO055Register address) {
-    std::array<uint8_t, 4> tx_buf{0xAA, 0x01,
-                                  stm32rcos::core::to_underlying(address), N};
+    std::array<uint8_t, 4> tx_buf{0xAA, 0x01, std::to_underlying(address), N};
     std::array<uint8_t, N> rx_buf;
     uart_.flush();
     if (!uart_.transmit(tx_buf.data(), tx_buf.size(), 5)) {

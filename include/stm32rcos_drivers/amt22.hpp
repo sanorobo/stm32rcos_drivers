@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdint>
 #include <optional>
+#include <utility>
 
 #include <stm32rcos/core.hpp>
 #include <stm32rcos/hal.hpp>
@@ -44,7 +45,7 @@ public:
       return std::nullopt;
     }
     return ((*res)[0] << 8 | (*res)[1]) &
-           ((1 << stm32rcos::core::to_underlying(resolution_)) - 1);
+           ((1 << std::to_underlying(resolution_)) - 1);
   }
 
   std::optional<int16_t> read_turns() {
