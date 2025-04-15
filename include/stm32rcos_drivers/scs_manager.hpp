@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <optional>
 
-#include <stm32rcos/peripheral/uart.hpp>
+#include <stm32rcos/peripheral.hpp>
 
 namespace stm32rcos_drivers {
 

@@ -7,7 +7,7 @@
 #include <optional>
 
 #include <stm32rcos/core.hpp>
-#include <stm32rcos/peripheral/can.hpp>
+#include <stm32rcos/peripheral.hpp>
 
 namespace stm32rcos_drivers {
 
