@@ -9,14 +9,14 @@
 
 namespace stm32rcos_drivers {
 
-enum class AMT21Resolution : uint8_t {
+enum class Amt21Resolution : uint8_t {
   BIT_12 = 12,
   BIT_14 = 14,
 };
 
-class AMT21Manager {
+class Amt21Manager {
 public:
-  AMT21Manager(stm32rcos::peripheral::UartBase &uart) : uart_{uart} {}
+  Amt21Manager(stm32rcos::peripheral::UartBase &uart) : uart_{uart} {}
 
   std::optional<std::array<uint8_t, 2>> send_command(uint8_t address,
                                                      uint8_t command) {
@@ -58,9 +58,9 @@ private:
   static inline bool bit(uint8_t x, uint8_t i) { return ((x >> i) & 1) == 1; }
 };
 
-class AMT21 {
+class Amt21 {
 public:
-  AMT21(AMT21Manager &manager, AMT21Resolution resolution, uint8_t address)
+  Amt21(Amt21Manager &manager, Amt21Resolution resolution, uint8_t address)
       : manager_{manager}, resolution_{resolution}, address_{address} {}
 
   std::optional<uint16_t> read_position() {
@@ -91,8 +91,8 @@ public:
   bool reset() { return manager_.send_extended_command(address_, 0x75); }
 
 private:
-  AMT21Manager &manager_;
-  AMT21Resolution resolution_;
+  Amt21Manager &manager_;
+  Amt21Resolution resolution_;
   uint8_t address_;
 };
 

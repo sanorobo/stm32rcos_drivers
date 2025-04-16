@@ -9,19 +9,19 @@
 
 namespace stm32rcos_drivers {
 
-struct RGB {
+struct Rgb {
   float r;
   float g;
   float b;
 };
 
-struct HSV {
+struct Hsv {
   float h;
   float s;
   float v;
 };
 
-inline RGB to_rgb(const HSV &hsv) {
+inline Rgb to_rgb(const Hsv &hsv) {
   float c = hsv.v * hsv.s;
   float x = c * (1.0f - std::fabs(std::fmod(hsv.h / 60.0f, 2.0f) - 1.0f));
   float m = hsv.v - c;
@@ -45,9 +45,9 @@ inline RGB to_rgb(const HSV &hsv) {
 // freq: 800kHz
 // counter period: 25-1
 // dma circular mode
-class WS2812B {
+class Ws2812b {
 public:
-  WS2812B(TIM_HandleTypeDef *htim, uint32_t channel, size_t size)
+  Ws2812b(TIM_HandleTypeDef *htim, uint32_t channel, size_t size)
       : htim_{htim}, channel_{channel}, size_{size},
         buf_(RESET_CODE + size * 24, 0) {
     HAL_TIM_PWM_Start_DMA(htim_, channel_,
@@ -55,7 +55,7 @@ public:
                           buf_.size());
   }
 
-  void set_rgb(size_t index, const RGB &rgb) {
+  void set_rgb(size_t index, const Rgb &rgb) {
     uint8_t r = rgb.r * 255.0f;
     uint8_t g = rgb.g * 255.0f;
     uint8_t b = rgb.b * 255.0f;
@@ -89,7 +89,7 @@ public:
     }
   }
 
-  void set_rgb_all(const RGB &rgb) {
+  void set_rgb_all(const Rgb &rgb) {
     for (size_t i = 0; i < size_; ++i) {
       set_rgb(i, rgb);
     }

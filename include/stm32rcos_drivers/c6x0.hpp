@@ -17,7 +17,7 @@ enum class C6x0Type {
   C620,
 };
 
-enum class C6x0ID {
+enum class C6x0Id {
   ID_1,
   ID_2,
   ID_3,
@@ -79,17 +79,17 @@ public:
     return can_.transmit(msg, 5);
   }
 
-  int64_t get_position(C6x0ID id) {
+  int64_t get_position(C6x0Id id) {
     return params_[std::to_underlying(id)].position_;
   }
 
-  int16_t get_rpm(C6x0ID id) { return params_[std::to_underlying(id)].rpm_; }
+  int16_t get_rpm(C6x0Id id) { return params_[std::to_underlying(id)].rpm_; }
 
-  int16_t get_current_raw(C6x0ID id) {
+  int16_t get_current_raw(C6x0Id id) {
     return params_[std::to_underlying(id)].current_raw_;
   }
 
-  void set_current_ref_raw(C6x0ID id, int16_t current) {
+  void set_current_ref_raw(C6x0Id id, int16_t current) {
     params_[std::to_underlying(id)].current_ref_raw_ = current;
   }
 
@@ -109,7 +109,7 @@ private:
 
 class C6x0 {
 public:
-  C6x0(C6x0Manager &manager, C6x0Type type, C6x0ID id)
+  C6x0(C6x0Manager &manager, C6x0Type type, C6x0Id id)
       : manager_{manager}, type_{type}, id_{id} {}
 
   ~C6x0() { set_current_ref(0); }
@@ -143,7 +143,7 @@ public:
 private:
   C6x0Manager &manager_;
   C6x0Type type_;
-  C6x0ID id_;
+  C6x0Id id_;
 };
 
 } // namespace stm32rcos_drivers

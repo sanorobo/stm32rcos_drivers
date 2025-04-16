@@ -9,9 +9,9 @@
 
 namespace stm32rcos_drivers {
 
-class SCSManager {
+class ScsManager {
 public:
-  SCSManager(stm32rcos::peripheral::UartBase &uart) : uart_{uart} {}
+  ScsManager(stm32rcos::peripheral::UartBase &uart) : uart_{uart} {}
 
   std::optional<uint8_t> ping(uint8_t id) {
     if (!send_message(id, Instruction::PING, 0, nullptr, 0)) {

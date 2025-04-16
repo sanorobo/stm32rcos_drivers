@@ -14,7 +14,7 @@
 
 namespace stm32rcos_drivers {
 
-enum class BNO055Register : uint8_t {
+enum class Bno055Register : uint8_t {
   // Page 0
   CHIP_ID = 0x00,
   ACC_ID = 0x01,
@@ -131,19 +131,19 @@ enum class BNO055Register : uint8_t {
   GYR_AM_SET = 0x1F
 };
 
-class BNO055 {
+class Bno055 {
 public:
-  BNO055(stm32rcos::peripheral::UartBase &uart) : uart_{uart} {}
+  Bno055(stm32rcos::peripheral::UartBase &uart) : uart_{uart} {}
 
   bool start(uint32_t timeout) {
     stm32rcos::core::TimeoutHelper timeout_helper;
     while (!timeout_helper.is_timeout(timeout)) {
       std::array<uint8_t, 1> data{0x00};
-      if (!write_register(BNO055Register::OPR_MODE, data)) {
+      if (!write_register(Bno055Register::OPR_MODE, data)) {
         continue;
       }
       data[0] = 0x08;
-      if (!write_register(BNO055Register::OPR_MODE, data)) {
+      if (!write_register(Bno055Register::OPR_MODE, data)) {
         continue;
       }
       return true;
@@ -152,7 +152,7 @@ public:
   }
 
   std::optional<Eigen::Quaternionf> get_quaternion() {
-    auto res = read_register<8>(BNO055Register::QUA_DATA_W_LSB);
+    auto res = read_register<8>(Bno055Register::QUA_DATA_W_LSB);
     if (!res) {
       return std::nullopt;
     }
@@ -164,7 +164,7 @@ public:
   }
 
   template <size_t N>
-  bool write_register(BNO055Register address,
+  bool write_register(Bno055Register address,
                       const std::array<uint8_t, N> &data) {
     std::array<uint8_t, 4> buf{0xAA, 0x00, std::to_underlying(address), N};
     uart_.flush();
@@ -181,7 +181,7 @@ public:
   }
 
   template <size_t N>
-  std::optional<std::array<uint8_t, N>> read_register(BNO055Register address) {
+  std::optional<std::array<uint8_t, N>> read_register(Bno055Register address) {
     std::array<uint8_t, 4> tx_buf{0xAA, 0x01, std::to_underlying(address), N};
     std::array<uint8_t, N> rx_buf;
     uart_.flush();

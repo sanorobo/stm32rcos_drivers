@@ -10,15 +10,15 @@
 
 namespace stm32rcos_drivers {
 
-enum class AMT22Resolution : uint8_t {
+enum class Amt22Resolution : uint8_t {
   BIT_12 = 12,
   BIT_14 = 14,
 };
 
-class AMT22 {
+class Amt22 {
 public:
-  AMT22(SPI_HandleTypeDef *hspi, GPIO_TypeDef *cs_port, uint16_t cs_pin,
-        AMT22Resolution resolution)
+  Amt22(SPI_HandleTypeDef *hspi, GPIO_TypeDef *cs_port, uint16_t cs_pin,
+        Amt22Resolution resolution)
       : hspi_{hspi}, cs_port_{cs_port}, cs_pin_{cs_pin},
         resolution_{resolution} {
     HAL_GPIO_WritePin(cs_port_, cs_pin_, GPIO_PIN_SET);
@@ -26,12 +26,12 @@ public:
     HAL_SPI_RegisterCallback(
         hspi_, HAL_SPI_TX_RX_COMPLETE_CB_ID, [](SPI_HandleTypeDef *hspi) {
           auto amt22 =
-              reinterpret_cast<AMT22 *>(stm32rcos::hal::get_spi_context(hspi));
+              reinterpret_cast<Amt22 *>(stm32rcos::hal::get_spi_context(hspi));
           amt22->tx_rx_sem_.release();
         });
   }
 
-  ~AMT22() {
+  ~Amt22() {
     HAL_SPI_Abort_IT(hspi_);
     HAL_SPI_UnRegisterCallback(hspi_, HAL_SPI_TX_RX_COMPLETE_CB_ID);
     stm32rcos::hal::set_spi_context(hspi_, nullptr);
@@ -76,7 +76,7 @@ private:
   GPIO_TypeDef *cs_port_;
   uint16_t cs_pin_;
   stm32rcos::core::Semaphore tx_rx_sem_{1, 1};
-  AMT22Resolution resolution_;
+  Amt22Resolution resolution_;
 
   template <size_t N>
   std::optional<std::array<uint8_t, N>>

@@ -13,13 +13,13 @@
 
 namespace stm32rcos_drivers {
 
-enum class UnitreeGOMode : uint8_t {
+enum class UnitreeGoMode : uint8_t {
   LOCK,
   FOC,
   CALIBRATION,
 };
 
-enum class UnitreeGOError : uint8_t {
+enum class UnitreeGoError : uint8_t {
   NORMAL,
   OVERHEATING,
   OVERCURRENT,
@@ -27,9 +27,9 @@ enum class UnitreeGOError : uint8_t {
   ENCODER_FAULT,
 };
 
-struct UnitreeGOCommand {
+struct UnitreeGoCommand {
   uint8_t id;
-  UnitreeGOMode mode;
+  UnitreeGoMode mode;
   float torque;
   float radps;
   float rad;
@@ -37,22 +37,22 @@ struct UnitreeGOCommand {
   float kd;
 };
 
-struct UnitreeGOFeedback {
+struct UnitreeGoFeedback {
   uint8_t id;
-  UnitreeGOMode mode;
+  UnitreeGoMode mode;
   float torque;
   float radps;
   float rad;
   int8_t temp;
-  UnitreeGOError error;
+  UnitreeGoError error;
   int16_t force;
 };
 
-class UnitreeGO {
+class UnitreeGo {
 public:
-  UnitreeGO(stm32rcos::peripheral::UartBase &uart) : uart_{uart} {}
+  UnitreeGo(stm32rcos::peripheral::UartBase &uart) : uart_{uart} {}
 
-  std::optional<UnitreeGOFeedback> transmit(const UnitreeGOCommand &command) {
+  std::optional<UnitreeGoFeedback> transmit(const UnitreeGoCommand &command) {
     auto tx_buf = to_uart_buf(command);
     std::array<uint8_t, 16> rx_buf;
     uart_.flush();
@@ -69,7 +69,7 @@ private:
   stm32rcos::peripheral::UartBase &uart_;
 
   static inline std::array<uint8_t, 17>
-  to_uart_buf(const UnitreeGOCommand &command) {
+  to_uart_buf(const UnitreeGoCommand &command) {
     int16_t tau_set = std::clamp(command.torque, -127.99f, 127.99f) * 256.0f;
     int16_t omega_set = std::clamp(command.radps, -804.0f, 804.0f) /
                         (2.0f * std::numbers::pi) * 256.0f;
@@ -99,7 +99,7 @@ private:
     return buf;
   }
 
-  static inline std::optional<UnitreeGOFeedback>
+  static inline std::optional<UnitreeGoFeedback>
   to_unitree_go_feedback(const std::array<uint8_t, 16> &buf) {
     if (buf[0] != 0xFD || buf[1] != 0xEE) {
       return std::nullopt;
@@ -109,9 +109,9 @@ private:
       return std::nullopt;
     }
 
-    UnitreeGOFeedback feedback;
+    UnitreeGoFeedback feedback;
     feedback.id = buf[2] & 0x0F;
-    feedback.mode = static_cast<UnitreeGOMode>((buf[2] >> 4) & 0x07);
+    feedback.mode = static_cast<UnitreeGoMode>((buf[2] >> 4) & 0x07);
     feedback.torque = static_cast<int16_t>((buf[4] << 8) | buf[3]) / 256.0f;
     feedback.radps = static_cast<int16_t>((buf[6] << 8) | buf[5]) / 256.0f *
                      2.0f * std::numbers::pi;
@@ -119,7 +119,7 @@ private:
                                         (buf[8] << 8) | buf[7]) /
                    32768.0f * 2.0f * std::numbers::pi;
     feedback.temp = buf[11];
-    feedback.error = static_cast<UnitreeGOError>(buf[12] & 0x07);
+    feedback.error = static_cast<UnitreeGoError>(buf[12] & 0x07);
     feedback.force = (buf[13] & 0x7F) | ((buf[12] >> 3) & 0x1F);
     return feedback;
   }
