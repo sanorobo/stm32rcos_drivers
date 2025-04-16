@@ -56,10 +56,10 @@ public:
     auto tx_buf = to_uart_buf(command);
     std::array<uint8_t, 16> rx_buf;
     uart_.flush();
-    if (!uart_.transmit(tx_buf.data(), tx_buf.size(), 10)) {
+    if (!uart_.transmit(tx_buf.data(), tx_buf.size(), 5)) {
       return std::nullopt;
     }
-    if (!uart_.receive(rx_buf.data(), rx_buf.size(), 10)) {
+    if (!uart_.receive(rx_buf.data(), rx_buf.size(), 5)) {
       return std::nullopt;
     }
     return to_unitree_go_feedback(rx_buf);
