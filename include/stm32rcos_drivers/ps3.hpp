@@ -9,14 +9,14 @@
 
 namespace stm32rcos_drivers {
 
-enum class PS3Axis {
+enum class Ps3Axis {
   LEFT_X,
   LEFT_Y,
   RIGHT_X,
   RIGHT_Y,
 };
 
-enum class PS3Key {
+enum class Ps3Key {
   UP,
   DOWN,
   RIGHT,
@@ -33,9 +33,9 @@ enum class PS3Key {
   SELECT,
 };
 
-class PS3 {
+class Ps3 {
 public:
-  PS3(stm32rcos::peripheral::UartBase &uart) : uart_{uart} {}
+  Ps3(stm32rcos::peripheral::UartBase &uart) : uart_{uart} {}
 
   void update() {
     keys_prev_ = keys_;
@@ -59,17 +59,17 @@ public:
     }
   }
 
-  float get_axis(PS3Axis axis) { return axes_[std::to_underlying(axis)]; }
+  float get_axis(Ps3Axis axis) { return axes_[std::to_underlying(axis)]; }
 
-  bool get_key(PS3Key key) {
+  bool get_key(Ps3Key key) {
     return (keys_ & (1 << std::to_underlying(key))) != 0;
   }
 
-  bool get_key_down(PS3Key key) {
+  bool get_key_down(Ps3Key key) {
     return ((keys_ ^ keys_prev_) & keys_ & (1 << std::to_underlying(key))) != 0;
   }
 
-  bool get_key_up(PS3Key key) {
+  bool get_key_up(Ps3Key key) {
     return ((keys_ ^ keys_prev_) & keys_prev_ &
             (1 << std::to_underlying(key))) != 0;
   }
