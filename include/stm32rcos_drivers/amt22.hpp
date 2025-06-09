@@ -5,8 +5,10 @@
 #include <optional>
 #include <utility>
 
+#include <stm32cubemx_helper/context.hpp>
+#include <stm32cubemx_helper/device.hpp>
+
 #include <stm32rcos/core.hpp>
-#include <stm32rcos/hal.hpp>
 
 namespace stm32rcos_drivers {
 
@@ -15,26 +17,23 @@ enum class Amt22Resolution : uint8_t {
   BIT_14 = 14,
 };
 
-class Amt22 {
+template <SPI_HandleTypeDef *Handle> class Amt22 {
 public:
-  Amt22(SPI_HandleTypeDef *hspi, GPIO_TypeDef *cs_port, uint16_t cs_pin,
-        Amt22Resolution resolution)
-      : hspi_{hspi}, cs_port_{cs_port}, cs_pin_{cs_pin},
-        resolution_{resolution} {
+  Amt22(GPIO_TypeDef *cs_port, uint16_t cs_pin, Amt22Resolution resolution)
+      : cs_port_{cs_port}, cs_pin_{cs_pin}, resolution_{resolution} {
     HAL_GPIO_WritePin(cs_port_, cs_pin_, GPIO_PIN_SET);
-    stm32rcos::hal::set_spi_context(hspi_, this);
+    stm32cubemx_helper::set_context<Handle, Amt22>(this);
     HAL_SPI_RegisterCallback(
-        hspi_, HAL_SPI_TX_RX_COMPLETE_CB_ID, [](SPI_HandleTypeDef *hspi) {
-          auto amt22 =
-              reinterpret_cast<Amt22 *>(stm32rcos::hal::get_spi_context(hspi));
+        Handle, HAL_SPI_TX_RX_COMPLETE_CB_ID, [](SPI_HandleTypeDef *hspi) {
+          auto amt22 = stm32cubemx_helper::get_context<Handle, Amt22>();
           amt22->tx_rx_sem_.release();
         });
   }
 
   ~Amt22() {
-    HAL_SPI_Abort_IT(hspi_);
-    HAL_SPI_UnRegisterCallback(hspi_, HAL_SPI_TX_RX_COMPLETE_CB_ID);
-    stm32rcos::hal::set_spi_context(hspi_, nullptr);
+    HAL_SPI_Abort_IT(Handle);
+    HAL_SPI_UnRegisterCallback(Handle, HAL_SPI_TX_RX_COMPLETE_CB_ID);
+    stm32cubemx_helper::set_context<Handle, Amt22>(nullptr);
     HAL_GPIO_WritePin(cs_port_, cs_pin_, GPIO_PIN_RESET);
   }
 
@@ -72,7 +71,6 @@ public:
   }
 
 private:
-  SPI_HandleTypeDef *hspi_;
   GPIO_TypeDef *cs_port_;
   uint16_t cs_pin_;
   stm32rcos::core::Semaphore tx_rx_sem_{1, 1};
@@ -84,14 +82,14 @@ private:
     std::array<uint8_t, N> buf;
     HAL_GPIO_WritePin(cs_port_, cs_pin_, GPIO_PIN_RESET);
     for (size_t i = 0; i < N; ++i) {
-      tx_rx_sem_.try_acquire(0);
-      if (HAL_SPI_TransmitReceive_IT(hspi_, &command[i], &buf[i],
+      tx_rx_sem_.acquire(0);
+      if (HAL_SPI_TransmitReceive_IT(Handle, &command[i], &buf[i],
                                      sizeof(uint8_t))) {
-        HAL_SPI_Abort_IT(hspi_);
+        HAL_SPI_Abort_IT(Handle);
         return std::nullopt;
       }
-      if (!tx_rx_sem_.try_acquire(1)) {
-        HAL_SPI_Abort_IT(hspi_);
+      if (!tx_rx_sem_.acquire(1)) {
+        HAL_SPI_Abort_IT(Handle);
         return std::nullopt;
       }
     }
